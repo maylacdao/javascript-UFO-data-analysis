@@ -1,61 +1,84 @@
 // from data.js
 var tableData = data;
 
-// YOUR CODE HERE!
+// select tbody 
+tbody = d3.select("tbody")
+console.log("hello")
 
-//Create function to display tabulated data in <tbody>
-function renderTable(ufoSightings) {
-  var tbody = d3.select("tbody");
-  ufoSightings.forEach((ufoRecord) => {
-    var row = tbody.append("tr");
-    Object.entries(ufoRecord).forEach(([key, value]) => {
-      var cell = row.append("td");
-      cell.html(value);
-    });
-  });
-};
+// loop through table using pbject entries
+function renderTable(something){ 
+    tbody.text("")
+    something.forEach(function(et_sighting){
+    new_tr = tbody.append("tr")
+    Object.entries(et_sighting).forEach(function([key, value]){
+        new_td = new_tr.append("td").text(value)	
+    })
+})}
+
+renderTable(tableData)
+
+console.log("hello2")
 
 
-//Delete previously loaded data
-function deleteTable () {
-    d3.select("tbody")
-        .selectAll("tr").remove()
-        .selectAll("td").remove();
-};
+// Select the submit button
+var submit = d3.select("#submit");
 
-//Preview data
-console.log(tableData);
+submit.on("click", function() {
+    console.log("hello3")
 
-//Initial data display
-renderTable(tableData);
-
-//Create button variable
-var button = d3.select("#filter-btn")
-
-//Make data filterable and display filtered data
-button.on("click", function(event) {
+  // Prevent the page from refreshing
   d3.event.preventDefault();
-  deleteTable();
-  var date = d3.select("#datetime").property("value");
 
-    if (date.trim() === "") {
-        //If no date input, display whole database
-        var filteredData = tableData;
-    
-    } else {
-        //Show filtered data
-        var filteredData = tableData.filter(ufoSighting => ufoSighting.datetime === date.trim());
-    };
+  // Select the input element and get the raw HTML node
+  var dateInput = d3.select("#datetime");
+  var cityInput = d3.select("#city");
+  var stateInput = d3.select("#state");
+  var countryInput = d3.select("#country");
+  var shapeInput = d3.select("#shape");
 
-    //Display "No Records Found" if no record don't exist in database
-    if (filteredData.length== 0) {
-        d3.select("tbody")
-            .append("tr")
-            .append("td")
-                .attr("colspan", 8)
-                .html("<h3> No Records Found</h4>");
-    };
+  // Get the value property of the input element
+  console.log(dateInput.property("value"));
+  console.log(cityInput.property("value"));
+  console.log(stateInput.property("value"));
+  console.log(countryInput.property("value"));
+  console.log(shapeInput.property("value"));
 
-    console.log(filteredData);
-    renderTable(filteredData);
+  //create a variable which filters the table if a user enters only some information in so that it will still work
+
+ var filtered = tableData.filter(et_sighting =>{
+  return (et_sighting.datetime===dateInput.property("value") || !dateInput.property("value") ) && 
+            (et_sighting.city===cityInput.property("value") || !cityInput.property("value")) &&
+            (et_sighting.state===stateInput.property("value") || !stateInput.property("value")) &&
+            (et_sighting.country===countryInput.property("value") || !countryInput.property("value")) &&
+            (et_sighting.shape===shapeInput.property("value") || !shapeInput.property("value"))
+ })
+
+ //run the filtered entries through the displayData function to update the table
+ renderTable(filtered);
+
+
+});
+
+var filterInputs = d3.selectAll('.form-control');
+
+// Clears input fields and input object
+function clearEntries() {
+    filters = {};
+
+    // Sets every input field to empty
+    filterInputs._groups[0].forEach(entry => {
+        if (entry.value != 0) {
+            d3.select('#' + entry.id).node().value = "";
+        }
+    });
+};
+
+var clearButton = d3.select("#clear");
+// Clear button on click clears fields
+clearButton.on('click', function () {
+
+    // Keeps page from refreshing completely, only want the table to refresh
+    d3.event.preventDefault();
+    // Clears input fields
+    clearEntries()
 });
